@@ -14,7 +14,25 @@
 
 package mondrian.olap.fun.sort;
 
-import junit.framework.TestCase;
+import static java.util.Arrays.asList;
+import static java.util.stream.IntStream.range;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import org.apache.commons.collections.comparators.ComparatorChain;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
 import mondrian.calc.Calc;
 import mondrian.calc.TupleCollections;
 import mondrian.calc.TupleIterable;
@@ -26,23 +44,8 @@ import mondrian.olap.Query;
 import mondrian.olap.fun.MemberOrderKeyFunDef;
 import mondrian.server.Execution;
 import mondrian.server.Statement;
-import org.apache.commons.collections.comparators.ComparatorChain;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.IntStream.range;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
-
-public class SorterTest extends TestCase {
+public class SorterTest{
 
   @Mock Evaluator evaluator;
   @Mock Query query;
@@ -61,8 +64,9 @@ public class SorterTest extends TestCase {
   @Captor ArgumentCaptor<TupleComparator> comparatorCaptor;
 
 
+  @BeforeEach
   public void setUp() throws Exception {
-    super.setUp();
+    
     MockitoAnnotations.initMocks( this );
     when( sortKeySpec1.getKey() ).thenReturn( calc1 );
     when( sortKeySpec2.getKey() ).thenReturn( calc2 );
@@ -79,6 +83,7 @@ public class SorterTest extends TestCase {
   // +--------------+---------------------+------------------------------+
   // |Not-OrderByKey| BreakTupleComparator|HierarchicalTupleComparator   |
   // +--------------+---------------------+------------------------------+
+  @Test
   public void testComparatorSelectionBrkOrderByKey() {
     setupSortKeyMocks( true, Sorter.Flag.BASC, Sorter.Flag.BDESC );
     Sorter.applySortSpecToComparator( evaluator, 2, comparatorChain, sortKeySpec1 );
@@ -87,6 +92,7 @@ public class SorterTest extends TestCase {
     verify( comparatorChain ).addComparator( any( TupleExpMemoComparator.BreakTupleComparator.class ), eq( true ) );
   }
 
+  @Test
   public void testComparatorSelectionBrkNotOrderByKey() {
     setupSortKeyMocks( false, Sorter.Flag.BASC, Sorter.Flag.BDESC );
     Sorter.applySortSpecToComparator( evaluator, 2, comparatorChain, sortKeySpec1 );
@@ -95,6 +101,7 @@ public class SorterTest extends TestCase {
     verify( comparatorChain ).addComparator( any( TupleExpMemoComparator.BreakTupleComparator.class ), eq( true ) );
   }
 
+  @Test
   public void testComparatorSelectionNotBreakingOrderByKey() {
     setupSortKeyMocks( true, Sorter.Flag.ASC, Sorter.Flag.DESC );
     Sorter.applySortSpecToComparator( evaluator, 2, comparatorChain, sortKeySpec1 );
@@ -103,6 +110,7 @@ public class SorterTest extends TestCase {
     verify( comparatorChain ).addComparator( any( HierarchicalTupleKeyComparator.class ), eq( true ) );
   }
 
+  @Test
   public void testComparatorSelectionNotBreaking() {
     setupSortKeyMocks( false, Sorter.Flag.ASC, Sorter.Flag.DESC );
     Sorter.applySortSpecToComparator( evaluator, 2, comparatorChain, sortKeySpec1 );
@@ -112,14 +120,14 @@ public class SorterTest extends TestCase {
     assertTrue( comparatorCaptor.getAllValues().get( 1 ) instanceof HierarchicalTupleComparator );
   }
 
-
+  @Test
   public void testSortTuplesBreakingByKey() {
     TupleList tupleList = genList();
     setupSortKeyMocks( true, Sorter.Flag.BASC, Sorter.Flag.BDESC );
 
     TupleList result =
       Sorter.sortTuples( evaluator, tupleIterable, tupleList, asList( sortKeySpec1, sortKeySpec2 ), 2 );
-    verifyZeroInteractions( tupleIterable ); // list passed in, used instead of iterable
+    verifyNoInteractions( tupleIterable ); // list passed in, used instead of iterable
     verify( calc1, atLeastOnce() ).dependsOn( hierarchy1 );
     verify( calc1, atLeastOnce() ).dependsOn( hierarchy2 );
     verify( calc2, atLeastOnce() ).dependsOn( hierarchy2 );
@@ -127,6 +135,7 @@ public class SorterTest extends TestCase {
     assertTrue( result.size() == 1000 );
   }
 
+  @Test
   public void testCancel() {
     setupSortKeyMocks( true, Sorter.Flag.ASC, Sorter.Flag.DESC );
     // pass in a null tupleList, and an iterable.  cancel should be checked while generating the list

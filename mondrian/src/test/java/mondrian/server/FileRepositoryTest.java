@@ -9,23 +9,25 @@
 */
 package mondrian.server;
 
-import mondrian.olap.MondrianServer;
-import mondrian.server.FileRepository.CatalogInfo;
-
-import junit.framework.TestCase;
-
-import org.olap4j.OlapConnection;
-
-import java.util.Properties;
-
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-public class FileRepositoryTest extends TestCase {
+import java.util.Properties;
 
+import org.junit.jupiter.api.Test;
+import org.olap4j.OlapConnection;
+
+import mondrian.olap.MondrianServer;
+import mondrian.server.FileRepository.CatalogInfo;
+
+public class FileRepositoryTest {
+
+    @Test
      public void testGetServerInfo_ifGetDataSourceInfoIsCalled() {
         final String datasourceNameStub = "DATASOURCE_NAME";
         final String datasourceInfoStub = "DATASOURCE_INFO";
@@ -73,6 +75,7 @@ public class FileRepositoryTest extends TestCase {
             databaseInfo.getProperties().containsValue(datasourceInfoStub));
      }
 
+    @Test
      public void testDiscoverDatasourceLegacyNameMatch() throws Exception {
          final String contentStub =
              "<?xml version=\"1.0\""
@@ -115,7 +118,7 @@ public class FileRepositoryTest extends TestCase {
          // Some sanity checks.
          FileRepository.DatabaseInfo databaseInfo =
              serverInfo.getDatasourceMap().get("Pentaho Mondrian");
-         assertNotNull("Database not found by name", databaseInfo);
+         assertNotNull(databaseInfo,"Database not found by name");
 
          // Moar mocks.
          final Properties mockProps = mock(Properties.class);

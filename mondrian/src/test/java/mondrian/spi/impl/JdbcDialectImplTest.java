@@ -9,9 +9,15 @@
  */
 package mondrian.spi.impl;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
-public class JdbcDialectImplTest extends TestCase {
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+public class JdbcDialectImplTest{
   private static final String ILLEGAL_BOOLEAN_LITERAL =
       "illegal for base dialect implemetation boolean literal";
   private static final String ILLEGAL_BOOLEAN_LITERAL_MESSAGE =
@@ -22,33 +28,38 @@ public class JdbcDialectImplTest extends TestCase {
   private static final String BOOLEAN_LITERAL_ZERO = "0";
 
   private JdbcDialectImpl jdbcDialect = new JdbcDialectImpl();
-  private StringBuilder buf;
+  private static StringBuilder buf;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
     buf = new StringBuilder();
   }
 
+  @Test
   public void testAllowsRegularExpressionInWhereClause() {
     assertFalse(jdbcDialect.allowsRegularExpressionInWhereClause());
   }
 
+  @Test
   public void testGenerateRegularExpression() {
     assertNull(jdbcDialect.generateRegularExpression(null, null));
   }
 
+  @Test
   public void testQuoteBooleanLiteral_True() throws Exception {
     assertEquals(0, buf.length());
     jdbcDialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_TRUE);
     assertEquals(BOOLEAN_LITERAL_TRUE, buf.toString());
   }
 
+  @Test
   public void testQuoteBooleanLiteral_False() throws Exception {
     assertEquals(0, buf.length());
     jdbcDialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_FALSE);
     assertEquals(BOOLEAN_LITERAL_FALSE, buf.toString());
   }
 
+  @Test
   public void testQuoteBooleanLiteral_OneIllegaLiteral() throws Exception {
     assertEquals(0, buf.length());
     try {
@@ -63,6 +74,7 @@ public class JdbcDialectImplTest extends TestCase {
     }
   }
 
+  @Test
   public void testQuoteBooleanLiteral_ZeroIllegaLiteral() throws Exception {
     assertEquals(0, buf.length());
     try {
@@ -77,6 +89,7 @@ public class JdbcDialectImplTest extends TestCase {
     }
   }
 
+  @Test
   public void testQuoteBooleanLiteral_TrowsExceptionOnIllegaLiteral()
       throws Exception {
     assertEquals(0, buf.length());

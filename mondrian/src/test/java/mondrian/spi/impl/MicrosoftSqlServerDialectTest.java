@@ -9,20 +9,24 @@
  */
 package mondrian.spi.impl;
 
-import static org.mockito.Matchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.mysql.jdbc.Statement;
 
-import junit.framework.TestCase;
 import mondrian.olap.Util;
 import mondrian.spi.Dialect;
 
-public class MicrosoftSqlServerDialectTest extends TestCase {
+public class MicrosoftSqlServerDialectTest{
 
   private static final String ILLEGAL_BOOLEAN_LITERAL =
       "illegal for this dialect boolean literal";
@@ -38,7 +42,7 @@ public class MicrosoftSqlServerDialectTest extends TestCase {
   private MicrosoftSqlServerDialect dialect;
   private StringBuilder buf;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
     when(metaData.getDatabaseProductName()).thenReturn(
         Dialect.DatabaseProduct.MSSQL.name());
@@ -49,31 +53,36 @@ public class MicrosoftSqlServerDialectTest extends TestCase {
     buf = new StringBuilder();
   }
 
+  @Test
   public void testQuoteBooleanLiteral_True() throws Exception {
     assertEquals(0, buf.length());
     dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_TRUE);
     assertEquals(Util.singleQuoteString(BOOLEAN_LITERAL_TRUE), buf.toString());
   }
 
+  @Test
   public void testQuoteBooleanLiteral_False() throws Exception {
     assertEquals(0, buf.length());
     dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_FALSE);
     assertEquals(Util.singleQuoteString(
         BOOLEAN_LITERAL_FALSE), buf.toString());
   }
-
+  
+  @Test
   public void testQuoteBooleanLiteral_One() throws Exception {
     assertEquals(0, buf.length());
     dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_ONE);
     assertEquals(Util.singleQuoteString(BOOLEAN_LITERAL_ONE), buf.toString());
   }
 
+  @Test
   public void testQuoteBooleanLiteral_Zero() throws Exception {
     assertEquals(0, buf.length());
     dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_ZERO);
     assertEquals(Util.singleQuoteString(BOOLEAN_LITERAL_ZERO), buf.toString());
   }
 
+  @Test
   public void testQuoteBooleanLiteral_TrowsException() throws Exception {
     assertEquals(0, buf.length());
     try {

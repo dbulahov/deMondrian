@@ -9,35 +9,31 @@
  */
 package mondrian.spi.impl;
 
-import junit.framework.TestCase;
-
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
 
 import java.sql.Date;
 
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doCallRealMethod;
+import org.junit.jupiter.api.Test;
 
 /**
  * Tests for SybaseDialect
  *
  * @author Yury Bakhmutski
  */
-public class SybaseDialectTest extends TestCase {
-    @Mock
-    SybaseDialect sybaseDialectMock;
+public class SybaseDialectTest{
+    
+    SybaseDialect sybaseDialectMock=mock(SybaseDialect.class);
 
-    @Override
-    protected void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-    }
 
     /**
      * Test for MONDRIAN-2259 issue.
      * Is assumed SybaseDialect methods are called.
      */
+    @Test
     public void testQuoteDateLiteral() {
         String input = "1997-01-03 00:00:00.0";
 

@@ -10,25 +10,56 @@
 */
 package mondrian.olap;
 
-import mondrian.olap.Util.ByteMatcher;
-import mondrian.rolap.RolapUtil;
-import mondrian.util.*;
-
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.Driver;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EmptyStackException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.Test;
+
+import mondrian.olap.Util.ByteMatcher;
+import mondrian.rolap.RolapUtil;
+import mondrian.util.ArraySortedSet;
+import mondrian.util.ArrayStack;
+import mondrian.util.ByteString;
+import mondrian.util.CartesianProductList;
+import mondrian.util.CombiningGenerator;
+import mondrian.util.Composite;
+import mondrian.util.LockBox;
+import mondrian.util.Pair;
+import mondrian.util.ServiceDiscovery;
+import mondrian.util.Triple;
+import mondrian.util.UnionIterator;
 
 /**
  * Tests for methods in {@link mondrian.olap.Util} and, sometimes, classes in
  * the {@code mondrian.util} package.
  */
-public class UtilTestCase extends TestCase {
-    public UtilTestCase(String s) {
-        super(s);
-    }
+public class UtilTestCase{
 
+
+    @Test
     public void testParseConnectStringSimple() {
         // Simple connect string
         Util.PropertyList properties =
@@ -42,6 +73,7 @@ public class UtilTestCase extends TestCase {
         assertEquals("foo=z; bar=y", properties.toString());
     }
 
+    @Test
     public void testParseConnectStringComplex() {
         Util.PropertyList properties =
             Util.parseConnectString(
@@ -99,6 +131,7 @@ public class UtilTestCase extends TestCase {
             properties.toString());
     }
 
+    @Test
     public void testConnectStringMore() {
         p("singleQuote=''''", "singleQuote", "'");
         p("doubleQuote=\"\"\"\"", "doubleQuote", "\"");
@@ -110,6 +143,7 @@ public class UtilTestCase extends TestCase {
      * MONDRIAN-397, "Connect string parser gives
      * StringIndexOutOfBoundsException instead of a meaningful error"</a>.
      */
+    @Test
     public void testBugMondrian397() {
         Util.PropertyList properties;
 
@@ -146,6 +180,7 @@ public class UtilTestCase extends TestCase {
         assertEquals(expectedValue, value);
     }
 
+    @Test
     public void testOleDbSpec() {
         p("Provider='MSDASQL'", "Provider", "MSDASQL");
         p("Provider='MSDASQL.1'", "Provider", "MSDASQL.1");
@@ -298,6 +333,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link Util#convertOlap4jConnectStringToNativeMondrian}.
      */
+    @Test
     public void testConvertConnectString() {
         assertEquals(
             "Provider=Mondrian; Datasource=jdbc/SampleData;"
@@ -307,6 +343,7 @@ public class UtilTestCase extends TestCase {
                 + "Catalog=foodmart/FoodMart.xml;"));
     }
 
+    @Test
     public void testQuoteMdxIdentifier() {
         assertEquals(
             "[San Francisco]", Util.quoteMdxIdentifier("San Francisco"));
@@ -322,6 +359,7 @@ public class UtilTestCase extends TestCase {
                     new Id.NameSegment("California"))));
     }
 
+    @Test
     public void testQuoteJava() {
         assertEquals(
             "\"San Francisco\"", Util.quoteJavaString("San Francisco"));
@@ -381,6 +419,7 @@ public class UtilTestCase extends TestCase {
         assertEquals(expected, Util.replace(original, seek, replace));
     }
 
+    @Test
     public void testImplode() {
         List<Id.Segment> fooBar = Arrays.<Id.Segment>asList(
             new Id.NameSegment("foo", Id.Quoting.UNQUOTED),
@@ -399,6 +438,7 @@ public class UtilTestCase extends TestCase {
             Util.implode(nasty));
     }
 
+    @Test
     public void testParseIdentifier() {
         List<Id.Segment> strings =
                 Util.parseIdentifier("[string].[with].[a [bracket]] in it]");
@@ -465,6 +505,7 @@ public class UtilTestCase extends TestCase {
         return ((Id.NameSegment) segment).name;
     }
 
+    @Test
     public void testReplaceProperties() {
         Map<String, String> map = new HashMap<String, String>();
         map.put("foo", "bar");
@@ -510,7 +551,8 @@ public class UtilTestCase extends TestCase {
             "${foobarbaz}",
             Util.replaceProperties("${foo${foo}baz}", map));
     }
-
+    
+    @Test
     public void testWildcard() {
         assertEquals(
             ".\\QFoo\\E.|\\QBar\\E.*\\QBAZ\\E",
@@ -518,6 +560,7 @@ public class UtilTestCase extends TestCase {
                 Arrays.asList("_Foo_", "Bar%BAZ")));
     }
 
+    @Test
     public void testCamel() {
         assertEquals(
             "FOO_BAR",
@@ -536,6 +579,7 @@ public class UtilTestCase extends TestCase {
             Util.camelToUpper(""));
     }
 
+    @Test
     public void testParseCommaList() {
         assertEquals(new ArrayList<String>(), Util.parseCommaList(""));
         assertEquals(Arrays.asList("x"), Util.parseCommaList("x"));
@@ -549,6 +593,7 @@ public class UtilTestCase extends TestCase {
         assertEquals(Arrays.asList("x", "y,"), Util.parseCommaList("x,y,,"));
     }
 
+    @Test
     public void testUnionIterator() {
         final List<String> xyList = Arrays.asList("x", "y");
         final List<String> abcList = Arrays.asList("a", "b", "c");
@@ -599,7 +644,7 @@ public class UtilTestCase extends TestCase {
         }
         assertEquals("x;y;a;b;c;", total);
     }
-
+    @Test
     public void testAreOccurrencesEqual() {
         assertFalse(Util.areOccurencesEqual(Collections.<String>emptyList()));
         assertTrue(Util.areOccurencesEqual(Arrays.asList("x")));
@@ -613,6 +658,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Tests {@link mondrian.util.ServiceDiscovery}.
      */
+    @Test
     public void testServiceDiscovery() {
         final ServiceDiscovery<Driver>
             serviceDiscovery = ServiceDiscovery.forClass(Driver.class);
@@ -633,12 +679,13 @@ public class UtilTestCase extends TestCase {
         for (Class<Driver> driverClass : list) {
             expectedClassNames.remove(driverClass.getName());
         }
-        assertTrue(expectedClassNames.toString(), expectedClassNames.isEmpty());
+        assertTrue( expectedClassNames.isEmpty(),expectedClassNames.toString());
     }
 
     /**
      * Unit test for {@link mondrian.util.ArrayStack}.
      */
+    @Test
     public void testArrayStack() {
         final ArrayStack<String> stack = new ArrayStack<String>();
         assertEquals(0, stack.size());
@@ -679,6 +726,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Tests {@link Util#appendArrays(Object[], Object[][])}.
      */
+    @Test
     public void testAppendArrays() {
         String[] a0 = {"a", "b", "c"};
         String[] a1 = {"foo", "bar"};
@@ -707,6 +755,7 @@ public class UtilTestCase extends TestCase {
             Arrays.asList(numbers));
     }
 
+    @Test
     public void testCanCast() {
         assertTrue(Util.canCast(Collections.EMPTY_LIST, Integer.class));
         assertTrue(Util.canCast(Collections.EMPTY_LIST, String.class));
@@ -725,6 +774,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link Util#parseLocale(String)} method.
      */
+    @Test
     public void testParseLocale() {
         Locale[] locales = {
             Locale.CANADA,
@@ -748,6 +798,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link mondrian.util.LockBox}.
      */
+    @Test
     public void testLockBox() {
         final LockBox box =
             new LockBox();
@@ -852,16 +903,17 @@ public class UtilTestCase extends TestCase {
         assertTrue(moniker.length() > 0);
         // all chars are valid
         for (int i = 0; i < moniker.length(); i++) {
-            assertTrue(moniker, validChars.indexOf(moniker.charAt(i)) >= 0);
+            assertTrue( validChars.indexOf(moniker.charAt(i)) >= 0,moniker);
         }
         // does not start with digit
-        assertFalse(moniker, digits.indexOf(moniker.charAt(0)) >= 0);
+        assertFalse(digits.indexOf(moniker.charAt(0)) >= 0,moniker);
     }
 
     /**
      * Unit test that ensures that {@link mondrian.util.LockBox} can "forget"
      * entries whose key has been forgotten.
      */
+    @Test
     public void testLockBoxFull() {
         final LockBox box =
             new LockBox();
@@ -893,6 +945,7 @@ public class UtilTestCase extends TestCase {
         }
     }
 
+    @Test
     public void testCartesianProductList() {
         final CartesianProductList<String> list =
             new CartesianProductList<String>(
@@ -994,6 +1047,7 @@ public class UtilTestCase extends TestCase {
         assertEquals(arrayList, list);
     }
 
+    @Test
     public void testFlatList() {
         final List<String> flatAB = Util.flatList("a", "b");
         final List<String> arrayAB = Arrays.asList("a", "b");
@@ -1033,6 +1087,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link Composite#of(Iterable[])}.
      */
+    @Test
     public void testCompositeIterable() {
         final Iterable<String> beatles =
             Arrays.asList("john", "paul", "george", "ringo");
@@ -1084,6 +1139,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link CombiningGenerator}.
      */
+    @Test
     public void testCombiningGenerator() {
         assertEquals(
             1,
@@ -1141,6 +1197,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link ByteString}.
      */
+    @Test
     public void testByteString() {
         final ByteString empty0 = new ByteString(new byte[]{});
         final ByteString empty1 = new ByteString(new byte[]{});
@@ -1177,6 +1234,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link Util#binarySearch}.
      */
+    @Test
     public void testBinarySearch() {
         final String[] abce = {"a", "b", "c", "e"};
         assertEquals(0, Util.binarySearch(abce, 0, 4, "a"));
@@ -1195,6 +1253,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link mondrian.util.ArraySortedSet}.
      */
+    @Test
     public void testArraySortedSet() {
         String[] abce = {"a", "b", "c", "e"};
         final SortedSet<String> abceSet =
@@ -1351,6 +1410,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link Triple}.
      */
+    @Test
     public void testTriple() {
         final Triple<Integer, String, Boolean> triple0 =
             Triple.of(5, "foo", true);
@@ -1386,6 +1446,7 @@ public class UtilTestCase extends TestCase {
         assertEquals("<null, foo, true>", triple3.toString());
     }
 
+    @Test
     public void testRolapUtilComparator() throws Exception {
         final Comparable[] compArray =
             new Comparable[] {
@@ -1400,6 +1461,7 @@ public class UtilTestCase extends TestCase {
             (Comparable)RolapUtil.sqlNullValue);
     }
 
+    @Test
     public void testByteMatcher() throws Exception {
         final ByteMatcher bm = new ByteMatcher(new byte[] {(byte)0x2A});
         final byte[] bytesNotPresent =
@@ -1421,6 +1483,7 @@ public class UtilTestCase extends TestCase {
      * {@link Util#toNullValuesMap(List)} never iterates on
      * its source list upon creation.
      */
+    @Test
     public void testNullValuesMap() throws Exception {
         class BaconationException extends RuntimeException {};
         Map<String, Object> nullValuesMap =
@@ -1456,6 +1519,7 @@ public class UtilTestCase extends TestCase {
     /**
      * Unit test for {@link Util#parseInterval}.
      */
+    @Test
     public void testParseInterval() {
         // no default unit
         assertEquals(
@@ -1503,10 +1567,10 @@ public class UtilTestCase extends TestCase {
             fail("expected error, got " + x);
         } catch (NumberFormatException e) {
             assertTrue(
-                e.getMessage(),
                 e.getMessage().startsWith(
                     "Invalid time interval '4'. Does not contain a time "
-                    + "unit."));
+                    + "unit."),
+            e.getMessage());
         }
         // fractional part rounded away
         assertEquals(
@@ -1519,10 +1583,10 @@ public class UtilTestCase extends TestCase {
             fail("expected error, got " + x);
         } catch (NumberFormatException e) {
             assertTrue(
-                e.getMessage(),
                 e.getMessage().startsWith(
                     "Invalid time interval '40S'. Does not contain a time "
-                    + "unit."));
+                    + "unit."),
+            e.getMessage());
         }
         // Even a space is not allowed.
         try {
@@ -1530,9 +1594,9 @@ public class UtilTestCase extends TestCase {
             fail("expected error, got " + x);
         } catch (NumberFormatException e) {
             assertTrue(
-                e.getMessage(),
                 e.getMessage().startsWith(
-                    "Invalid time interval '40 m'"));
+                    "Invalid time interval '40 m'"),
+            e.getMessage());
         }
         // Two time units.
         try {
@@ -1540,9 +1604,9 @@ public class UtilTestCase extends TestCase {
             fail("expected error, got " + x);
         } catch (NumberFormatException e) {
             assertTrue(
-                e.getMessage(),
                 e.getMessage().startsWith(
-                    "Invalid time interval '40sms'"));
+                    "Invalid time interval '40sms'"),
+            e.getMessage());
         }
         // Null
         try {

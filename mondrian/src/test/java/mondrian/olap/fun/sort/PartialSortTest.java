@@ -14,17 +14,17 @@
 
 package mondrian.olap.fun.sort;
 
-import junit.framework.Assert;
-import junit.framework.TestCase;
-import mondrian.test.PerformanceTest;
-import org.apache.commons.collections.ComparatorUtils;
-import org.apache.commons.collections.comparators.ReverseComparator;
-import org.apache.log4j.Logger;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+
+import org.apache.commons.collections.ComparatorUtils;
+import org.apache.commons.collections.comparators.ReverseComparator;
+import org.apache.log4j.Logger;
+import org.junit.jupiter.api.Test;
+
+import junit.framework.Assert;
 
 /**
  * <code>PartialSortTest</code> is a unit test for the partial-sort algorithm
@@ -34,7 +34,9 @@ import java.util.Random;
  * @author Marc Berkowitz
  * @since Nov 2008
  */
-public class PartialSortTest extends TestCase {
+public class PartialSortTest{
+    public static final Logger LOGGER =
+	    Logger.getLogger( PartialSortTest.class );
   final Random random = new Random();
 
   // subroutines
@@ -155,6 +157,7 @@ public class PartialSortTest extends TestCase {
   }
 
   // validate the predicate isPartiallySorted()
+  @Test
   public void testPredicate1() {
     int errct = 0;
     int size = 10 * 1000;
@@ -224,6 +227,7 @@ public class PartialSortTest extends TestCase {
   }
 
   // same as testPredicate() but boxed
+  @Test
   public void testPredicate2() {
     int errct = 0;
     int size = 10 * 1000;
@@ -293,6 +297,7 @@ public class PartialSortTest extends TestCase {
     Assert.assertTrue( errct == 0 );
   }
 
+  @Test
   public void testQuick() {
     final int length = 40;
     final int limit = 4;
@@ -302,6 +307,7 @@ public class PartialSortTest extends TestCase {
     Assert.assertTrue( isPartiallySorted( vec, limit, true ) );
   }
 
+  @Test
   public void testOnAlreadySorted() {
     final int length = 200;
     final int limit = 8;
@@ -314,6 +320,7 @@ public class PartialSortTest extends TestCase {
     Assert.assertTrue( isPartiallySorted( vec, limit, false ) );
   }
 
+  @Test
   public void testOnAlreadyReverseSorted() {
     final int length = 200;
     final int limit = 8;
@@ -358,6 +365,7 @@ public class PartialSortTest extends TestCase {
   }
 
   // test correctness
+  @Test
   public void testOnRandomIntegers() {
     randomIntegerTests( 100, 20 );
     randomIntegerTests( 50000, 10 );
@@ -366,6 +374,7 @@ public class PartialSortTest extends TestCase {
   }
 
   // test with large vector
+  @Test
   public void testOnManyRandomIntegers() {
     randomIntegerTests( 1000 * 1000, 5000 );
     randomIntegerTests( 1000 * 1000, 10 );
@@ -431,6 +440,7 @@ public class PartialSortTest extends TestCase {
     return sorted.toArray( new Item[ sorted.size() ] );
   }
 
+  @Test
   public void testPredicateIsStablySorted() {
     Item[] vec = newPartlySortedItems( 24, 4, false );
     Assert.assertTrue( Item.isStablySorted( vec, 4, false ) );
@@ -447,6 +457,7 @@ public class PartialSortTest extends TestCase {
   }
 
 
+  @Test
   public void testStableQuick() {
     final int length = 40;
     final int limit = 4;
@@ -487,6 +498,7 @@ public class PartialSortTest extends TestCase {
     Assert.assertTrue( Item.isStablySorted( vec, limit, false ) );
   }
 
+  @Test
   public void testStableOnRandomItems() {
     randomItemTests( 100, 20 );
     randomItemTests( 50000, 10 );
@@ -540,20 +552,21 @@ public class PartialSortTest extends TestCase {
   }
 
   // compare speed on different sizes of input
+  @Test
   public void testSpeed() {
-    if ( !PerformanceTest.LOGGER.isDebugEnabled() ) {
+    if ( !LOGGER.isDebugEnabled() ) {
       return;
     }
 
-    speedTest( PerformanceTest.LOGGER, 60, 2 );               // tiny
-    speedTest( PerformanceTest.LOGGER, 600, 12 );             // small
-    speedTest( PerformanceTest.LOGGER, 600, 200 );
-    speedTest( PerformanceTest.LOGGER, 16000, 4 );            // medium
-    speedTest( PerformanceTest.LOGGER, 16000, 160 );
-    speedTest( PerformanceTest.LOGGER, 1000000, 4 );          // large
-    speedTest( PerformanceTest.LOGGER, 1000000, 400 );
-    speedTest( PerformanceTest.LOGGER, 1000000, 4000 );
-    speedTest( PerformanceTest.LOGGER, 1000000, 40000 );
+    speedTest( LOGGER, 60, 2 );               // tiny
+    speedTest( LOGGER, 600, 12 );             // small
+    speedTest( LOGGER, 600, 200 );
+    speedTest( LOGGER, 16000, 4 );            // medium
+    speedTest( LOGGER, 16000, 160 );
+    speedTest( LOGGER, 1000000, 4 );          // large
+    speedTest( LOGGER, 1000000, 400 );
+    speedTest( LOGGER, 1000000, 4000 );
+    speedTest( LOGGER, 1000000, 40000 );
 
     // very large; needs bigger heap
     //speedTest(PerformanceTest.LOGGER, 1600 * 1600, 4);

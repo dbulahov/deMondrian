@@ -11,7 +11,11 @@
 
 package mondrian.olap;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test for <code>Cell Property<code>.
@@ -19,22 +23,26 @@ import junit.framework.TestCase;
  * @author Shishir
  * @since 08 May, 2007
  */
-public class CellPropertyTest extends TestCase {
+public class CellPropertyTest{
     private CellProperty cellProperty;
 
+    @BeforeEach
     protected void setUp() throws Exception {
-        super.setUp();
+
         cellProperty = new CellProperty(Id.Segment.toList("Format_String"));
     }
 
+    @Test
     public void testIsNameEquals() {
         assertTrue(cellProperty.isNameEquals("Format_String"));
     }
 
+    @Test
     public void testIsNameEqualsDoesCaseInsensitiveMatch() {
         assertTrue(cellProperty.isNameEquals("format_string"));
     }
 
+    @Test
     public void testIsNameEqualsParameterShouldNotBeQuoted() {
         assertFalse(cellProperty.isNameEquals("[Format_String]"));
     }

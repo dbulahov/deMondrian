@@ -9,19 +9,25 @@
  */
 package mondrian.spi.impl;
 
-import static org.mockito.Matchers.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.mysql.jdbc.Statement;
 
-import junit.framework.TestCase;
 import mondrian.spi.Dialect;
 
-public class MySqlDialectTest extends TestCase {
+public class MySqlDialectTest{
   private static final String ILLEGAL_BOOLEAN_LITERAL =
       "illegal for this dialect boolean literal";
   private static final String ILLEGAL_BOOLEAN_LITERAL_MESSAGE =
@@ -36,7 +42,7 @@ public class MySqlDialectTest extends TestCase {
   private MySqlDialect dialect;
   private StringBuilder buf;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
     when(metaData.getDatabaseProductName()).thenReturn(
         Dialect.DatabaseProduct.MYSQL.name());
@@ -48,16 +54,19 @@ public class MySqlDialectTest extends TestCase {
     buf = new StringBuilder();
   }
 
+  @Test
   public void testAllowsRegularExpressionInWhereClause() {
     assertTrue(dialect.allowsRegularExpressionInWhereClause());
   }
 
+  @Test
   public void testGenerateRegularExpression_InvalidRegex() throws Exception {
     assertNull(
-        "Invalid regex should be ignored",
-        dialect.generateRegularExpression("table.column", "(a"));
+         dialect.generateRegularExpression("table.column", "(a"),
+         "Invalid regex should be ignored");
   }
 
+  @Test
   public void testGenerateRegularExpression_CaseInsensitive()
       throws Exception {
     String sql =
@@ -67,6 +76,7 @@ public class MySqlDialectTest extends TestCase {
         sql);
   }
 
+  @Test
   public void testGenerateRegularExpression_CaseSensitive()
       throws Exception {
     String sql =
@@ -75,30 +85,35 @@ public class MySqlDialectTest extends TestCase {
         "table.column IS NOT NULL AND table.column REGEXP '.*a.*'", sql);
   }
 
+  @Test
   public void testQuoteBooleanLiteral_True() throws Exception {
     assertEquals(0, buf.length());
     dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_TRUE);
     assertEquals(BOOLEAN_LITERAL_TRUE, buf.toString());
   }
 
+  @Test
   public void testQuoteBooleanLiteral_False() throws Exception {
     assertEquals(0, buf.length());
     dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_FALSE);
     assertEquals(BOOLEAN_LITERAL_FALSE, buf.toString());
   }
 
+  @Test
   public void testQuoteBooleanLiteral_One() throws Exception {
     assertEquals(0, buf.length());
     dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_ONE);
     assertEquals(BOOLEAN_LITERAL_ONE, buf.toString());
   }
 
+  @Test
   public void testQuoteBooleanLiteral_Zero() throws Exception {
     assertEquals(0, buf.length());
     dialect.quoteBooleanLiteral(buf, BOOLEAN_LITERAL_ZERO);
     assertEquals(BOOLEAN_LITERAL_ZERO, buf.toString());
   }
 
+  @Test
   public void testQuoteBooleanLiteral_TrowsException() throws Exception {
     assertEquals(0, buf.length());
     try {

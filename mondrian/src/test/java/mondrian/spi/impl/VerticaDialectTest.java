@@ -8,43 +8,52 @@
  */
 package mondrian.spi.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 import com.mysql.jdbc.Statement;
 
-import junit.framework.TestCase;
 import mondrian.spi.Dialect;
 
-public class VerticaDialectTest extends TestCase {
+public class VerticaDialectTest{
   private Connection connection = mock( Connection.class );
   private DatabaseMetaData metaData = mock( DatabaseMetaData.class );
   Statement statmentMock = mock( Statement.class );
   private VerticaDialect dialect;
 
-  @Override
+  @BeforeEach
   protected void setUp() throws Exception {
     when( metaData.getDatabaseProductName() ).thenReturn( Dialect.DatabaseProduct.VERTICA.name() );
     when( connection.getMetaData() ).thenReturn( metaData );
     dialect = new VerticaDialect( connection );
   }
 
+  @Test
   public void testAllowsRegularExpressionInWhereClause() {
     assertTrue( dialect.allowsRegularExpressionInWhereClause() );
   }
 
+  @Test
   public void testGenerateRegularExpression_InvalidRegex() throws Exception {
-    assertNull( "Invalid regex should be ignored", dialect.generateRegularExpression( "table.column", "(a" ) );
+    assertNull( dialect.generateRegularExpression( "table.column", "(a" ),"Invalid regex should be ignored" );
   }
 
+  @Test
   public void testGenerateRegularExpression_CaseInsensitive() throws Exception {
     String sql = dialect.generateRegularExpression( "table.column", "(?is)|(?u).*a.*" );
     assertEquals( " REGEXP_LIKE ( CAST (table.column AS VARCHAR), '.*a.*', 'in')", sql );
   }
 
+  @Test
   public void testGenerateRegularExpression_CaseSensitive() throws Exception {
     String sql = dialect.generateRegularExpression( "table.column", ".*a.*" );
     assertEquals( " REGEXP_LIKE ( CAST (table.column AS VARCHAR), '.*a.*')", sql );

@@ -9,16 +9,21 @@
  */
 package mondrian.spi;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class DialectUtilTest extends TestCase {
+import org.junit.jupiter.api.Test;
 
+public class DialectUtilTest{
+
+  @Test
   public void testCleanUnicodeAwareCaseFlag_InputNull() {
     String inputExpression = null;
     String cleaned = DialectUtil.cleanUnicodeAwareCaseFlag( inputExpression );
     assertNull( cleaned );
   }
 
+  @Test
   public void testCleanUnicodeAwareCaseFlag_InputContainsFlag() {
     String inputExpression = "(?i)|(?u).*ａ.*";
     String expectedExpression = "(?i).*ａ.*";
@@ -26,6 +31,7 @@ public class DialectUtilTest extends TestCase {
     assertEquals( expectedExpression, cleaned );
   }
 
+  @Test
   public void testCleanUnicodeAwareCaseFlag_InputNotContainsFlag() {
     String inputExpression = "(?i).*ａ.*";
     String expectedExpression = "(?i).*ａ.*";
