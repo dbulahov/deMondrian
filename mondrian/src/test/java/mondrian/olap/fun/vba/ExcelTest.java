@@ -9,7 +9,9 @@
 
 package mondrian.olap.fun.vba;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for implementations of Excel worksheet functions.
@@ -23,9 +25,10 @@ import junit.framework.TestCase;
  * @author jhyde
  * @since Jan 16, 2008
  */
-public class ExcelTest extends TestCase {
+public class ExcelTest{
     private static final double SMALL = 1e-10d;
 
+    @Test
     public void testAcos() {
         // Cos(0) = 1
         // Cos(60 degrees) = .5
@@ -37,6 +40,7 @@ public class ExcelTest extends TestCase {
         assertEquals(Math.PI, Excel.acos(-1.0));
     }
 
+    @Test
     public void testAcosh() {
         // acosh(1) = 0
         // acosh(2) ~= 1
@@ -46,6 +50,7 @@ public class ExcelTest extends TestCase {
         assertEquals(2.0634370688955608, Excel.acosh(4.0), SMALL);
     }
 
+    @Test
     public void testAsinh() {
         // asinh(0) = 0
         // asinh(1) ~= 1
@@ -57,12 +62,14 @@ public class ExcelTest extends TestCase {
         assertEquals(-2.99822295029797, Excel.asinh(-10.0), SMALL);
     }
 
+    @Test
     public void testAtan2() {
         assertEquals(Math.atan2(0, 10), Excel.atan2(0, 10));
         assertEquals(Math.atan2(1, .8), Excel.atan2(1, .8));
         assertEquals(Math.atan2(-5, 0), Excel.atan2(-5, 0));
     }
 
+    @Test
     public void testAtanh() {
         // atanh(0) = 0
         // atanh(1) = +inf
@@ -76,23 +83,28 @@ public class ExcelTest extends TestCase {
         assertEquals(-6.1030338227611125, Excel.atanh(-0.99999), SMALL);
     }
 
+    @Test
     public void testCosh() {
         assertEquals(Math.cosh(0), Excel.cosh(0));
     }
 
+    @Test
     public void testDegrees() {
         assertEquals(90.0, Excel.degrees(Math.PI / 2));
     }
 
+    @Test
     public void testLog10() {
         assertEquals(1.0, Excel.log10(10));
         assertEquals(-2.0, Excel.log10(.01), 0.00000000000001);
     }
 
+    @Test
     public void testPi() {
         assertEquals(Math.PI, Excel.pi());
     }
 
+    @Test
     public void testPower() {
         assertEquals(0.0, Excel.power(0, 5));
         assertEquals(1.0, Excel.power(5, 0));
@@ -100,30 +112,36 @@ public class ExcelTest extends TestCase {
         assertEquals(0.125, Excel.power(2, -3));
     }
 
+    @Test
     public void testRadians() {
         assertEquals(Math.PI, Excel.radians(180.0));
         assertEquals(-Math.PI * 3.0, Excel.radians(-540.0));
     }
 
+    @Test
     public void testSinh() {
         assertEquals(Math.sinh(0), Excel.sinh(0));
     }
 
+    @Test
     public void testSqrtPi() {
         // sqrt(2 pi) = sqrt(6.28) ~ 2.5
         assertEquals(2.506628274631, Excel.sqrtPi(2.0), SMALL);
     }
 
+    @Test
     public void testTanh() {
         assertEquals(Math.tanh(0), Excel.tanh(0));
         assertEquals(Math.tanh(0.44), Excel.tanh(0.44));
     }
 
+    @Test
     public void testMod() {
         assertEquals(2.0, Excel.mod(28, 13));
         assertEquals(-11.0, Excel.mod(28, -13));
     }
-
+    
+    @Test
     public void testIntNative() {
         assertEquals(5, Vba.intNative(5.1));
         assertEquals(5, Vba.intNative(5.9));
