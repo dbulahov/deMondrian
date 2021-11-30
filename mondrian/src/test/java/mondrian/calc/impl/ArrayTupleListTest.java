@@ -9,20 +9,36 @@
 
 package mondrian.calc.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
 import mondrian.olap.Member;
 import mondrian.olap.MondrianProperties;
 import mondrian.olap.ResourceLimitExceededException;
-import mondrian.test.FoodMartTestCase;
+import mondrian.test.PropertySaver5;
 
-import static org.mockito.Mockito.mock;
 
-@SuppressWarnings( "java:S2187" ) // suppressing "no-tests" warning.  Mondrian still uses junit 3
-public class ArrayTupleListTest extends FoodMartTestCase {
+public class ArrayTupleListTest {
 
+  /**
+  * Access properties via this object and their values will be reset.
+  */
+  protected final PropertySaver5 propSaver = new PropertySaver5();  
+  
+  @AfterEach
+  public void afterEach() {
+      propSaver.reset();
+  }
   private Member member1 = mock( Member.class );
   private Member member2 = mock( Member.class );
   private ArrayTupleList list;
 
+  @Test
   public void testGrowListBeyondInitialCapacity() {
     propSaver.set( MondrianProperties.instance().ResultLimit, 0 );
     list = new ArrayTupleList( 2, 10 );
@@ -35,6 +51,7 @@ public class ArrayTupleListTest extends FoodMartTestCase {
     }
   }
 
+  @Test
   public void testAttemptToGrowBeyondResultLimit() {
     propSaver.set( MondrianProperties.instance().ResultLimit, 30 );
     list = new ArrayTupleList( 2, 10 );
@@ -42,8 +59,8 @@ public class ArrayTupleListTest extends FoodMartTestCase {
       addMockTuplesToList( list, 32 );
       fail( "Expected exception." );
     } catch ( ResourceLimitExceededException e ) {
-      assertTrue( "Actual message:  " + e.getMessage() + " \ndid not match expected",
-        e.getMessage().contains( "result (31) exceeded limit (30)" ) );
+      assertTrue( e.getMessage().contains( "result (31) exceeded limit (30)" ),
+    		  "Actual message:  " + e.getMessage() + " \ndid not match expected");
     }
   }
 
