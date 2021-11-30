@@ -9,10 +9,14 @@
 
 package mondrian.util;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class ExpiringReferenceTest extends TestCase
+import org.junit.jupiter.api.Test;
+
+public class ExpiringReferenceTest
 {
+    @Test
     public void testSimpleExpiryMode() throws Exception {
         final Object referent = new Object();
         final ExpiringReference<Object> reference =
@@ -23,6 +27,7 @@ public class ExpiringReferenceTest extends TestCase
         assertNull(reference.hardRef);
     }
 
+    @Test
     public void testExpiryModeReAccess() throws Exception {
         final Object referent = new Object();
         final ExpiringReference<Object> reference =
@@ -40,6 +45,7 @@ public class ExpiringReferenceTest extends TestCase
         assertNull(reference.hardRef);
     }
 
+    @Test
     public void testExpiryModeReAccessWithEmptyGet() throws Exception {
         final Object referent = new Object();
         final ExpiringReference<Object> reference =
@@ -52,6 +58,7 @@ public class ExpiringReferenceTest extends TestCase
         assertNull(reference.hardRef);
     }
 
+    @Test
     public void testSimpleSoftMode() throws Exception {
         final Object referent = new Object();
         final ExpiringReference<Object> reference =
@@ -61,6 +68,7 @@ public class ExpiringReferenceTest extends TestCase
         assertNull(reference.hardRef);
     }
 
+    @Test
     public void testSimplePermMode() throws Exception {
         final Object referent = new Object();
         final ExpiringReference<Object> reference =
@@ -72,6 +80,7 @@ public class ExpiringReferenceTest extends TestCase
         assertNotNull(reference.hardRef);
     }
 
+    @Test
     public void testPermModeFollowedByNonPermGet() throws Exception {
         final Object referent = new Object();
         final ExpiringReference<Object> reference =

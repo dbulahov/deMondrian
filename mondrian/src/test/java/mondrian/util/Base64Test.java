@@ -9,30 +9,35 @@
 
 package mondrian.util;
 
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.Random;
+
+import org.junit.jupiter.api.Test;
 
 /**
  * Test case for {@link Base64}.
  *
- * @author Brian Burton, Julian Hyde
+ * @author Brian Burton, Julian Hyde, Stefan Bischof
  */
-public class Base64Test extends TestCase
+public class Base64Test
 {
     private static final long SEED = 12345678;
     private static Random s_random = new Random(SEED);
 
-    private byte[] createData(int length) throws Exception
+    private static byte[] createData(int length) throws Exception
     {
         byte[] bytes = new byte[length];
         s_random.nextBytes(bytes);
         return bytes;
     }
 
-    private void runStreamTest(int length) throws Exception
+    private static void runStreamTest(int length) throws Exception
     {
         byte[] data = createData(length);
         ByteArrayOutputStream out_bytes = new ByteArrayOutputStream();
@@ -56,6 +61,7 @@ public class Base64Test extends TestCase
         assertTrue(Arrays.equals(data, decoded));
     }
 
+    @Test
     public void testStreams() throws Exception
     {
         for (int i = 0; i < 100; ++i) {
@@ -69,6 +75,7 @@ public class Base64Test extends TestCase
         }
     }
 
+    @Test
     public void testSimple()
     {
         String s =
@@ -94,7 +101,7 @@ public class Base64Test extends TestCase
         assertEqualsByteArray(s.getBytes(), s1);
     }
 
-    private void assertEqualsByteArray(byte[] bytes, byte[] bytes1) {
+    private static void assertEqualsByteArray(byte[] bytes, byte[] bytes1) {
         assertEquals(bytes.length, bytes1.length);
         for (int i = 0; i < bytes.length; i++) {
             assertEquals(bytes[i], bytes1[i]);

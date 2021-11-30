@@ -9,20 +9,20 @@
 
 package mondrian.util;
 
-import mondrian.test.TestContext;
-
-import junit.framework.TestCase;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.olap4j.test.TestContext;
 
 /**
  * Testcase for {@link mondrian.util.PrimeFinder}.
  *
- * @author jhyde
+ * @author jhyde, Stefan Bischof
  * @since Feb 4, 2007
  */
-public class PrimeFinderTest extends TestCase {
+public class PrimeFinderTest{
 
     private void assertStatistics(int from, int to, String expected) {
         StringWriter sw = new StringWriter();
@@ -32,6 +32,7 @@ public class PrimeFinderTest extends TestCase {
         TestContext.assertEqualsVerbose(expected, sw.toString());
     }
 
+    @Test
     public void testOne() {
         assertStatistics(
             1000,
@@ -42,6 +43,7 @@ public class PrimeFinderTest extends TestCase {
             + "maxDeviation = 3.9 %\n");
     }
 
+    @Test
     public void testTwo() {
         assertStatistics(
             200,
@@ -52,6 +54,7 @@ public class PrimeFinderTest extends TestCase {
             + "maxDeviation = 38.5 %\n");
     }
 
+    @Test
     public void testThree() {
         assertStatistics(
             16,
@@ -68,6 +71,8 @@ public class PrimeFinderTest extends TestCase {
     }
 
     // disabled because it takes a LONG time
+    @Test
+    @Disabled
     public void _testFour() {
         assertStatistics(1000, Integer.MAX_VALUE, "");
     }

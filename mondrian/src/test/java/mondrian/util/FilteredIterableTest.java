@@ -9,25 +9,27 @@
 
 package mondrian.util;
 
-import mondrian.test.FoodMartTestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.jupiter.api.Test;
+
 /**
  * Unit-test for FilteredIterable
  *
- * @author jlopez, lcanals
+ * @author jlopez, lcanals, Stefan Bischof
  * @since May, 2008
  */
-public class FilteredIterableTest extends FoodMartTestCase {
+public class FilteredIterableTest{
     public FilteredIterableTest() {
     }
 
-    public FilteredIterableTest(String name) {
-        super(name);
-    }
-
+    @Test
     public void testEmptyList() throws Exception {
         final List<Integer> base = new ArrayList<Integer>();
         for (int i = 0; i < 10; i++) {
@@ -47,7 +49,7 @@ public class FilteredIterableTest extends FoodMartTestCase {
         }
     }
 
-
+    @Test
     public void testGetter() throws Exception {
         final List<Integer> base = new ArrayList<Integer>();
         for (int i = 0; i < 10; i++) {
@@ -63,10 +65,11 @@ public class FilteredIterableTest extends FoodMartTestCase {
                     }
                 });
         for (int i = 0; i < 2; i++) {
-            assertEquals(new Integer(i), empty.get(i));
+            assertEquals(Integer.valueOf(i), empty.get(i));
         }
     }
 
+    @Test
     public void test2Elements() throws Exception {
         final List<Integer> base = new ArrayList<Integer>();
         for (int i = 0; i < 2; i++) {

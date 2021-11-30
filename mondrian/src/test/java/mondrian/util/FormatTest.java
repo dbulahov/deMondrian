@@ -9,23 +9,31 @@
 
 package mondrian.util;
 
-import junit.framework.Assert;
-import mondrian.olap.Util;
-import mondrian.test.I18nTest;
-
-import junit.framework.TestCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
+
+import org.junit.jupiter.api.Test;
+
+import mondrian.olap.Util;
 
 /**
  * Unit test for {@link Format}.
  *
- * @author jhyde
+ * @author jhyde, Stefan Bischof
  * @since May 26, 2006
  */
-public class FormatTest extends TestCase {
+public class FormatTest {
 
+    public static final char Euro = '\u20AC';
+    public static final char Nbsp = '\u00A0';
+    public static final char EA = '\u00e9'; // e acute
+    public static final char UC = '\u00FB'; // u circumflex
+    
     private final Format.FormatLocale localeFra = Format.createLocale(
         '.', // thousandSeparator = ',' in en
         ',', // decimalPlaceholder = '.' in en
@@ -63,10 +71,12 @@ public class FormatTest extends TestCase {
     /**
      * Exhaustive tests on various numbers.
      */
+    @Test
     public void testNumbers() {
         checkNumbersInLocale(null);
     }
-
+    
+    @Test
     public void testFrenchNumbers() {
         checkNumbersInLocale(localeFra);
     }
@@ -186,7 +196,8 @@ public class FormatTest extends TestCase {
         }
         return result;
     }
-
+    
+    @Test
     public void testTrickyNumbers() {
         checkFormat(null, new BigDecimal("40.385"), "##0.0#", "40.39");
         checkFormat(null, new BigDecimal("40.386"), "##0.0#", "40.39");
@@ -236,6 +247,7 @@ public class FormatTest extends TestCase {
      * Test case for bug <a href="http://jira.pentaho.com/browse/MONDRIAN-186">
      * MONDRIAN-186</a>, "Small negative numbers are printed as '-0'".
      */
+    @Test
     public void testSmallNegativeNumbers() {
         checkFormat(null, new BigDecimal("-0.006"), "#.0", ".0");
         checkFormat(null, new BigDecimal("-0.006"), "#.00", "-.01");
@@ -260,6 +272,7 @@ public class FormatTest extends TestCase {
      * a number is too small to appear in either format string, it underflows
      * to 'Nil', and gets to use a third format.
      */
+    @Test
     public void testNil() {
         // The +ve format gives "-0.01", but the negative format gives "0.0",
         // so we move onto the "Nil" format.
@@ -314,6 +327,7 @@ public class FormatTest extends TestCase {
     /**
      * Null values use the fourth format.
      */
+    @Test
     public void testNull() {
         // Null value with different numbers of strings
         checkFormat(
@@ -331,6 +345,7 @@ public class FormatTest extends TestCase {
             null, null, "\\P\\o\\s;;;", "");
     }
 
+    @Test
     public void testNegativeZero() {
         checkFormat(null, new BigDecimal("-0.0"), "#0.000", "0.000");
         checkFormat(null, new BigDecimal("-0.0"), "#0", "0");
@@ -342,6 +357,7 @@ public class FormatTest extends TestCase {
      * MONDRIAN-686</a>, "Regression: JPivot output invalid - New Variance
      * Percent column".
      */
+    @Test
     public void testPercentWithStyle() {
         checkFormat(
             null,
@@ -354,6 +370,7 @@ public class FormatTest extends TestCase {
      * Test case for bug <a href="http://jira.pentaho.com/browse/MONDRIAN-687">
      * MONDRIAN-687</a>, "Format treats negative numbers differently than SSAS".
      */
+    @Test
     public void testNegativePercentWithStyle() {
         if (Bug.BugMondrian687Fixed) {
             checkFormat(
@@ -401,6 +418,7 @@ public class FormatTest extends TestCase {
      * Single quotes in format string. SSAS 2005 removes them; Mondrian should
      * also.
      */
+    @Test
     public void testSingleQuotes() {
         if (Bug.BugMondrian687Fixed) {
             checkFormat(
@@ -422,11 +440,13 @@ public class FormatTest extends TestCase {
         }
     }
 
+    @Test
     public void testNegativePercent() {
         checkFormat(null, new BigDecimal("-0.0364"), "#.00%", "-3.64%");
         checkFormat(null, new BigDecimal("0.0364"), "#.00%", "3.64%");
     }
 
+    @Test
     public void testNumberRoundingBug() {
         checkFormat(null, new BigDecimal("0.50"), "0", "1");
         checkFormat(null, new BigDecimal("-1.5"), "0", "-2");
@@ -440,6 +460,7 @@ public class FormatTest extends TestCase {
         checkFormat(null, new BigDecimal("0.49999"), "#.0", ".5");
     }
 
+    @Test
     public void testCurrencyBug() {
         // The following case illustrates an outstanding bug.
         // Should be able to override '.' to '-',
@@ -461,6 +482,7 @@ public class FormatTest extends TestCase {
         return calendar.getTime();
     }
 
+    @Test
     public void testDates() {
         checkDate("dd-mmm-yy",     "29-Apr-69",  "29-Avr-69",  "29-Apr-69");
         checkDate("h:mm:ss AM/PM", "8:09:06 PM", "8#09#06 PM", "8:09:06 PM");
@@ -493,6 +515,7 @@ public class FormatTest extends TestCase {
         checkFormat(localeDe, date, format, de);
     }
 
+    @Test
     public void testAllTokens() {
         for (Format.Token fe : Format.getTokenList()) {
             Object o;
@@ -509,6 +532,7 @@ public class FormatTest extends TestCase {
         }
     }
 
+    @Test
     public void testTrickyDates() {
         // All examples have been checked with Excel2003 and AS2005.
 
@@ -562,10 +586,11 @@ public class FormatTest extends TestCase {
         checkFormat(null, date2, "Long Date", "Tuesday, September 07, 2010");
     }
 
+    @Test
     public void testFrenchLocale() {
         Format.FormatLocale fr = Format.createLocale(Locale.FRANCE);
-        assertEquals("#,##0.00 " + I18nTest.Euro, fr.currencyFormat);
-        assertEquals(I18nTest.Euro + "", fr.currencySymbol);
+        assertEquals("#,##0.00 " + Euro, fr.currencyFormat);
+        assertEquals(Euro + "", fr.currencySymbol);
         assertEquals("/", fr.dateSeparator);
         assertEquals(
             "[, dimanche, lundi, mardi, mercredi, jeudi, vendredi, samedi]",
@@ -574,18 +599,18 @@ public class FormatTest extends TestCase {
             "[, dim., lun., mar., mer., jeu., ven., sam.]",
             Arrays.toString(fr.daysOfWeekShort));
         assertEquals(
-            "[janvier, f" + I18nTest.EA + "vrier, mars, avril, mai, juin,"
-            + " juillet, ao" + I18nTest.UC
+            "[janvier, f" + EA + "vrier, mars, avril, mai, juin,"
+            + " juillet, ao" + UC
             + "t, septembre, octobre, novembre, d"
-            + I18nTest.EA + "cembre, ]",
+            + EA + "cembre, ]",
             Arrays.toString(fr.monthsLong));
         assertEquals(
-            "[janv., f" + I18nTest.EA + "vr., mars, avr., mai, juin,"
-            + " juil., ao" + I18nTest.UC + "t, sept., oct., nov., d"
-            + I18nTest.EA + "c., ]",
+            "[janv., f" + EA + "vr., mars, avr., mai, juin,"
+            + " juil., ao" + UC + "t, sept., oct., nov., d"
+            + EA + "c., ]",
             Arrays.toString(fr.monthsShort));
         assertEquals(',', fr.decimalPlaceholder);
-        assertEquals(I18nTest.Nbsp, fr.thousandSeparator);
+        assertEquals(Nbsp, fr.thousandSeparator);
         assertEquals(":", fr.timeSeparator);
     }
 
@@ -627,6 +652,7 @@ public class FormatTest extends TestCase {
         }
     }
 
+    @Test
     public void testCache() {
         StringBuilder buf = new StringBuilder(Format.CacheLimit * 2 + 10);
         buf.append("0.");
@@ -638,6 +664,7 @@ public class FormatTest extends TestCase {
         }
     }
 
+    @Test
     public void testString() {
         // Excel2003
         checkFormat(null, "This Is A Test", ">", "THIS IS A TEST");
@@ -693,6 +720,7 @@ public class FormatTest extends TestCase {
         checkFormat(null, string, "$#,#.#", string);
     }
 
+    @Test
     public void testNonNumericValuesUsingNumericFormat() {
         // All of the following have been checked in Excel 2003.
 
@@ -720,6 +748,7 @@ public class FormatTest extends TestCase {
         checkFormat(null, -123.45E6, ">", "-123,450,000");
     }
 
+    @Test
     public void testFormatThousands() {
         checkFormat(
             null,
@@ -803,6 +832,7 @@ public class FormatTest extends TestCase {
      * MONDRIAN-968</a>, "Thousands formatting does not work. #,###,, <-
      * Multiple Comma not rounding".
      */
+    @Test
     public void testThousandsThousands() {
         final int i = 1234567890;
         if (false) {
@@ -827,17 +857,18 @@ public class FormatTest extends TestCase {
      * Tests the international currency symbol parsing
      * in format strings according to different locales.
      */
+    @Test
     public void testCurrency() {
         checkFormat(
             localeDe,
             123456,
             "Currency",
-            "123.456,00 \u20AC");
+            "123.456,00 "+ Euro);
         checkFormat(
             localeDe,
             123456,
             "###,###.00" + Format.intlCurrencySymbol,
-            "123.456,00\u20AC");
+            "123.456,00" + Euro);
         checkFormat(
             localeFra,
             123456,
@@ -865,6 +896,7 @@ public class FormatTest extends TestCase {
             "$1");
     }
 
+    @Test
     public void testInfinity() {
         String[] strings = {"#", "#.#", "#,###.0"};
         for (String string : strings) {
@@ -882,13 +914,14 @@ public class FormatTest extends TestCase {
     }
 
     // PDI-16761
+    @Test
     public void testBigDecimalJavaFormat() {
         BigDecimal bd = new BigDecimal("123456789123456789123456789");
         Format.BasicFormat format = new Format.JavaFormat(Locale.FRENCH);
         StringBuilder result = new StringBuilder();
         format.format(bd, result);
         // It should run without losing precision
-        Assert.assertEquals("123 456 789 123 456 789 123 456 789", result.toString());
+        assertEquals("123"+Nbsp+"456"+Nbsp+"789"+Nbsp+"123"+Nbsp+"456"+Nbsp+"789"+Nbsp+"123"+Nbsp+"456"+Nbsp+"789", result.toString());
     }
 
     /**
@@ -897,6 +930,8 @@ public class FormatTest extends TestCase {
      * "ArrayIndexOutOfBoundsException in mondrian.util.Format.formatFd2
      * formatting a BigDecimal".
      */
+
+    @Test
     public void testBigDecimalWithSpecificCustomFormat() {
       //the format string used in the jira case
       final String format = "0000000000000";

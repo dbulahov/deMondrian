@@ -8,6 +8,7 @@
 */
 package mondrian.olap4j;
 
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -17,19 +18,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
+
 import mondrian.olap.MondrianServer;
 import mondrian.olap.Util;
 import mondrian.olap.Util.PropertyList;
 import mondrian.rolap.RolapConnection;
 import mondrian.rolap.RolapConnectionProperties;
 
-public class XmlaExtraTest extends TestCase {
+public class XmlaExtraTest{
     /**
      * This test makes sure that the value of
      * {@link RolapConnectionProperties#JdbcPassword} isn't leaked through
      * the XmlaExtra interface.
      */
+    @Test
      public void testGetDataSourceDoesntLeakPassword() throws Exception {
         final List<Map<String, Object>> expectedList =
             new ArrayList<Map<String,Object>>();

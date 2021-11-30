@@ -9,18 +9,24 @@
 
 package mondrian.util;
 
-import junit.framework.TestCase;
-import mondrian.olap.Util;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Random;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.Test;
+
+import mondrian.olap.Util;
 
 /**
  * Testcase for {@link BlockingHashMap}.
  *
- * @author mcampbell
+ * @author mcampbell, Stefan Bischof
  */
-public class BlockingHashMapTest extends TestCase {
+public class BlockingHashMapTest{
 
     private final Random random = Util.createRandom(-1);
     private static final int SLEEP_TIME = 100;
@@ -34,6 +40,7 @@ public class BlockingHashMapTest extends TestCase {
      * is greater than 2 seconds.
      *
      */
+    @Test
     public void testBlockingHashMap() throws InterruptedException {
         BlockingHashMap<Integer, Integer> map =
             new BlockingHashMap<Integer, Integer>(100);

@@ -23,6 +23,7 @@
     <guava.version>17.0</guava.version>
     <driver.version.major>${project.version.major}</driver.version.major>
     <maven-failsafe-plugin.argLine>-Duser.language=en -Duser.country=US</maven-failsafe-plugin.argLine>
+ 	<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -155,10 +156,16 @@
       <version>${xmlunit.version}</version>
       <scope>test</scope>
     </dependency>
+<!--     <dependency> -->
+<!--       <groupId>org.mockito</groupId> -->
+<!--       <artifactId>mockito-all</artifactId> -->
+<!--       <version>${mockito-all.version}</version> -->
+<!--       <scope>test</scope> -->
+<!--     </dependency> -->
     <dependency>
       <groupId>org.mockito</groupId>
-      <artifactId>mockito-all</artifactId>
-      <version>${mockito-all.version}</version>
+      <artifactId>mockito-core</artifactId>
+      <version>4.1.0</version>
       <scope>test</scope>
     </dependency>
     <dependency>
