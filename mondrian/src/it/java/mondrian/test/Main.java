@@ -394,7 +394,6 @@ public class Main extends TestSuite {
       if ( Bug.BugMondrian503Fixed ) {
         addTest( suite, RolapResultTest.class );
       }
-      addTest( suite, ConstantCalcTest.class );
       addTest( suite, SharedDimensionTest.class );
       addTest( suite, CellPropertyTest.class );
       addTest( suite, QueryTest.class );

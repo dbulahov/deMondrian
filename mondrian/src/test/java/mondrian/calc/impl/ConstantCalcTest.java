@@ -11,21 +11,27 @@
 
 package mondrian.calc.impl;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
+
 import mondrian.olap.fun.FunUtil;
 import mondrian.olap.type.NullType;
-
-import junit.framework.TestCase;
 
 /**
  * Test for <code>ConstantCalc</code>
  * @author Matt
+ * @author stbischof
  */
-public class ConstantCalcTest extends TestCase {
+public class ConstantCalcTest{
+	
+	@Test
     public void testNullEvaluatesToConstantDoubleNull() {
         ConstantCalc constantCalc = new ConstantCalc(new NullType(), null);
         assertEquals(FunUtil.DoubleNull, constantCalc.evaluateDouble(null));
     }
-
+	
+	@Test
     public void testNullEvaluatesToConstantIntegerNull() {
         ConstantCalc constantCalc = new ConstantCalc(new NullType(), null);
         assertEquals(FunUtil.IntegerNull, constantCalc.evaluateInteger(null));
