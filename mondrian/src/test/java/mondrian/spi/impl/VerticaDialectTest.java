@@ -16,11 +16,11 @@ import static org.mockito.Mockito.when;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.Statement;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.mysql.jdbc.Statement;
 
 import mondrian.spi.Dialect;
 
