@@ -13,5 +13,6 @@
   	<module>org.eclipse.daanse.sql.dialect.common</module>
   	<module>org.eclipse.daanse.sql.dialect.sqlite</module>
   	<module>org.eclipse.daanse.sql.dialect.core</module>
+    <module>org.eclipse.daanse.sql.dialect.mysql</module>
   </modules>
 </project>
